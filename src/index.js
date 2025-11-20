@@ -1,11 +1,10 @@
 import './index.css';
 import gnomeSrc from './assets/gnome.png';
 
-// Настройки поля
 const SIZE = 4;
-const MOVE_INTERVAL_MS = 3000; // время смены картинки
+export const MOVE_INTERVAL_MS = 3000;
 
-function createGrid(container) {
+export function createGrid(container) {
   const grid = document.createElement('div');
   grid.id = 'game';
 
@@ -20,37 +19,31 @@ function createGrid(container) {
   return grid;
 }
 
-function randomIndex(excludeIndex, max) {
-  let idx = Math.floor(Math.random() * max);
-  // исключение повторения той-же ячейки
-  while (idx === excludeIndex) {
-    idx = Math.floor(Math.random() * max);
-  }
-  return idx;
-}
-
-function placeGnomeInitially(grid, img) {
+export function placeGnomeInitially(grid, img) {
   const cells = Array.from(grid.querySelectorAll('.cell'));
   const idx = Math.floor(Math.random() * cells.length);
   cells[idx].appendChild(img);
   return idx;
 }
 
-function startMoving(grid, img, initialIndex) {
+export function startMoving(grid, img, initialIndex) {
   const cells = Array.from(grid.querySelectorAll('.cell'));
   let currentIndex = initialIndex;
   const max = cells.length;
 
   return setInterval(() => {
-    const nextIndex = randomIndex(currentIndex, max);
-    cells[nextIndex].append(img);
-    currentIndex = nextIndex;
+    const nextIndex = Math.floor(Math.random() * max);
+    if (nextIndex !== currentIndex) {
+      cells[nextIndex].appendChild(img);
+      currentIndex = nextIndex;
+    }
   }, MOVE_INTERVAL_MS);
 }
 
-function main() {
-  const app = document.getElementById('app');
-  const grid = createGrid(app);
+export function main(appContainer = document.getElementById('app')) {
+  if (!appContainer) return;
+
+  const grid = createGrid(appContainer);
 
   const img = document.createElement('img');
   img.src = gnomeSrc;
@@ -62,7 +55,7 @@ function main() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', main);
+  document.addEventListener('DOMContentLoaded', () => main());
 } else {
   main();
 }
