@@ -4,6 +4,7 @@ import gnomeSrc from './assets/gnome.png';
 const SIZE = 4;
 export const MOVE_INTERVAL_MS = 3000;
 
+// Создание игрового поля
 export function createGrid(container) {
   const grid = document.createElement('div');
   grid.id = 'game';
@@ -12,17 +13,17 @@ export function createGrid(container) {
     const cell = document.createElement('div');
     cell.className = 'cell';
     cell.dataset.index = r;
-    grid.appendChild(cell);
+    grid.append(cell);
   }
 
-  container.appendChild(grid);
+  container.append(grid);
   return grid;
 }
 
 export function placeGnomeInitially(grid, img) {
   const cells = Array.from(grid.querySelectorAll('.cell'));
   const idx = Math.floor(Math.random() * cells.length);
-  cells[idx].appendChild(img);
+  cells[idx].append(img); // ← заменено appendChild
   return idx;
 }
 
@@ -31,13 +32,17 @@ export function startMoving(grid, img, initialIndex) {
   let currentIndex = initialIndex;
   const max = cells.length;
 
-  return setInterval(() => {
+  const intervalId = setInterval(() => {
     const nextIndex = Math.floor(Math.random() * max);
     if (nextIndex !== currentIndex) {
-      cells[nextIndex].appendChild(img);
+      cells[nextIndex].append(img);
       currentIndex = nextIndex;
     }
   }, MOVE_INTERVAL_MS);
+
+  return function stopMoving() {
+    clearInterval(intervalId);
+  };
 }
 
 export function main(appContainer = document.getElementById('app')) {
@@ -51,7 +56,9 @@ export function main(appContainer = document.getElementById('app')) {
 
   const initial = placeGnomeInitially(grid, img);
 
-  startMoving(grid, img, initial);
+  const stopMoving = startMoving(grid, img, initial);
+
+  return { stopMoving };
 }
 
 if (document.readyState === 'loading') {
